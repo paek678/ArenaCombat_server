@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using ArenaCombat.Core.AI;
 using ArenaCombat.Core.Skill;
 
 namespace ArenaCombat.Core.Network
@@ -47,12 +48,14 @@ namespace ArenaCombat.Core.Network
             if (_subscribedGSM != null || GameStateManager.Instance == null) return;
             _subscribedGSM = GameStateManager.Instance;
             _subscribedGSM.OnCardDraftEndedServer += HandleDraftEnded;
+            _subscribedGSM.OnMatchStateChanged += HandleMatchStateChanged;
         }
 
         void Unsubscribe()
         {
             if (_subscribedGSM == null) return;
             _subscribedGSM.OnCardDraftEndedServer -= HandleDraftEnded;
+            _subscribedGSM.OnMatchStateChanged -= HandleMatchStateChanged;
             _subscribedGSM = null;
         }
 
@@ -99,6 +102,60 @@ namespace ArenaCombat.Core.Network
             });
 
             Debug.Log($"[RoundRecord] {entityName} | stage={stage} | [{string.Join(", ", skills)}]");
+        }
+
+        void HandleMatchStateChanged(MatchState prev, MatchState next)
+        {
+            if (next != MatchState.MatchEnd && next != MatchState.RoundEnd) return;
+            if (!NetworkManager.Singleton || !NetworkManager.Singleton.IsServer) return;
+            DumpPlayerClassification(next);
+        }
+
+        void DumpPlayerClassification(MatchState endState)
+        {
+            var nm = NetworkManager.Singleton;
+            if (nm == null) return;
+
+            var classifier = PlayerArchetypeClassifier.Instance;
+            var biasTracker = PlayerBiasTracker.Instance;
+            var poolMgr = BossAIPoolManager.Instance;
+
+            Debug.Log("══════════════════════════════════════════");
+            Debug.Log($"[{endState}] Player Classification Report");
+            Debug.Log("══════════════════════════════════════════");
+
+            foreach (var client in nm.ConnectedClientsList)
+            {
+                if (client.PlayerObject == null) continue;
+                ulong id = client.ClientId;
+
+                var archetype = classifier != null ? classifier.GetArchetype(id) : PlayerArchetype.Hybrid;
+
+                string weightsStr = "(N/A)";
+                if (classifier != null && classifier.TryGetWeights(id, out float m, out float r, out float c))
+                    weightsStr = $"M={m:F2} R={r:F2} C={c:F2} (total={m + r + c:F2})";
+
+                string biasStr = "(N/A)";
+                if (biasTracker != null)
+                {
+                    float[] biases = biasTracker.GetBiases(id);
+                    if (biases != null)
+                        biasStr = $"Melee={biases[0]:F2} Ranged={biases[1]:F2} ActFreq={biases[2]:F2} " +
+                                  $"Surv={biases[3]:F2} Parry={biases[4]:F2} Rope={biases[5]:F2} " +
+                                  $"SkillFreq={biases[6]:F2} TeamClose={biases[7]:F2} TeamSpread={biases[8]:F2}";
+                }
+
+                Debug.Log($"  Player_{id}: Archetype={archetype} | Weights: {weightsStr}");
+                Debug.Log($"    Biases: {biasStr}");
+            }
+
+            if (poolMgr != null)
+            {
+                var current = poolMgr.CurrentVariant;
+                Debug.Log($"  Boss AI Variant: {(current != null ? current.variantName ?? current.name : "(none)")}");
+            }
+
+            Debug.Log("══════════════════════════════════════════");
         }
 
         public void RecordManual(string entityName, int stage, SkillManager skillMgr)
