@@ -227,6 +227,12 @@ namespace ArenaCombat.Core.Network
                 return;
             }
 
+            // Block auto-start until all players have finished loading the scene.
+            if (SceneLoadSyncManager.Instance != null && !SceneLoadSyncManager.Instance.AllPlayersLoaded)
+            {
+                return;
+            }
+
             int connectedPlayers = GetConnectedPlayerCount();
             int requiredPlayers = autoStartAllowHostOnly ? 1 : Mathf.Max(1, minPlayersToStart);
             if (connectedPlayers < requiredPlayers)

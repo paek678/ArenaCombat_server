@@ -327,11 +327,11 @@ namespace ArenaCombat.UI.TestUI
 
             string hostText = lobbyManager.IsHost ? " (HOST)" : "";
             AddDebugLog($"Entered lobby successfully{hostText}");
-            AddDebugLog($"Lobby Code: {lobby.LobbyCode}");
+            AddDebugLog($"Code - {lobby.LobbyCode}");
 
             if (lobbyCodeText != null)
             {
-                lobbyCodeText.text = $"Lobby Code: {lobby.LobbyCode}";
+                lobbyCodeText.text = $"Code - {lobby.LobbyCode}";
             }
 
             // Host can see start game button
