@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0606cc0234635b741b1ff737732ccb7c, type: 3}
   m_Name: AbilityCard 6
   m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.Card.AbilityCard
-  cardName: "봉인 사슬"
+  cardName: "\uBD09\uC778 \uC0AC\uC2AC"
   cardIcon: {fileID: 1089222004, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: SealChain
   skillDefinition: {fileID: 11400000, guid: 4b896dceeb5d9694493bd6ef9fe1969e, type: 2}
-  skillObjectName:
+  skillObjectName: 7

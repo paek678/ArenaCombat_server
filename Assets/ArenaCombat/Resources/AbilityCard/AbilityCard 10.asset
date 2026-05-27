@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0606cc0234635b741b1ff737732ccb7c, type: 3}
   m_Name: AbilityCard 10
   m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.Card.AbilityCard
-  cardName: "관통 사격"
+  cardName: "\uAD00\uD1B5 \uC0AC\uACA9"
   cardIcon: {fileID: 805198549, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: PiercingShot
   skillDefinition: {fileID: 11400000, guid: 99d9d45b55396be41800e5e95abc9dad, type: 2}
-  skillObjectName:
+  skillObjectName: 11

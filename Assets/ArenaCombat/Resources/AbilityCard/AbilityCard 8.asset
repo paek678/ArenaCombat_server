@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0606cc0234635b741b1ff737732ccb7c, type: 3}
   m_Name: AbilityCard 8
   m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.Card.AbilityCard
-  cardName: "방벽 파괴"
+  cardName: "\uBC29\uBCBD \uD30C\uAD34"
   cardIcon: {fileID: 2035836826, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: BarrierBreaker
   skillDefinition: {fileID: 11400000, guid: e77be0445542b6948a4556aa5dbf54d9, type: 2}
-  skillObjectName:
+  skillObjectName: 9

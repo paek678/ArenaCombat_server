@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0606cc0234635b741b1ff737732ccb7c, type: 3}
   m_Name: AbilityCard 5
   m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.Card.AbilityCard
-  cardName: "사냥 표식"
+  cardName: "\uC0AC\uB0E5 \uD45C\uC2DD"
   cardIcon: {fileID: -614099588, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: HuntingMark
   skillDefinition: {fileID: 11400000, guid: 119107e1446c91947a8aca98b21cb16d, type: 2}
-  skillObjectName:
+  skillObjectName: 6

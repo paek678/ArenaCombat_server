@@ -211,7 +211,7 @@ namespace ArenaCombat.UI.TestUI
             slot.statusText.text = "Online";
             slot.statusText.color = Color.green;
 
-            slot.actionButton.gameObject.SetActive(isMe);
+            slot.actionButton.gameObject.SetActive(false);
 
             if (isMe)
                 slot.background.color = mySlotColor;

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0606cc0234635b741b1ff737732ccb7c, type: 3}
   m_Name: AbilityCard 9
   m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.Card.AbilityCard
-  cardName: "과충전 모드"
+  cardName: "\uACFC\uCDA9\uC804 \uBAA8\uB4DC"
   cardIcon: {fileID: 1798258090, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: OverchargeMode
   skillDefinition: {fileID: 11400000, guid: 7d436b7be22114f4484b24dbf0158ff3, type: 2}
-  skillObjectName:
+  skillObjectName: 10

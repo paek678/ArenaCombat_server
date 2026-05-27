@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0606cc0234635b741b1ff737732ccb7c, type: 3}
   m_Name: AbilityCard 4
   m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.Card.AbilityCard
-  cardName: "분쇄 탄막"
+  cardName: "\uBD84\uC1C4 \uD0C4\uB9C9"
   cardIcon: {fileID: 341104153, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: CrushingBarrage
   skillDefinition: {fileID: 11400000, guid: db5169202e250d54ab3aaa9593fe5b79, type: 2}
-  skillObjectName:
+  skillObjectName: 5

@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "ArenaCombat6.slnx"
+    "dotnet.defaultSolution": "ArenaCombat_server.slnx"
 }

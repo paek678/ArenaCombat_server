@@ -16,4 +16,4 @@ MonoBehaviour:
   cardIcon: {fileID: -900658182, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: FortressArmor
   skillDefinition: {fileID: 11400000, guid: 20d5486fcb416dd4ca37663146fa2dcc, type: 2}
-  skillObjectName:
+  skillObjectName: 2

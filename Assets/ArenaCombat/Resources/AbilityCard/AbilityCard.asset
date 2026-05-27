@@ -16,4 +16,4 @@ MonoBehaviour:
   cardIcon: {fileID: 398994254, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: ExecutionSpike
   skillDefinition: {fileID: 11400000, guid: 829a3958c84a7f8449265fbcabef2fcb, type: 2}
-  skillObjectName:
+  skillObjectName: 1

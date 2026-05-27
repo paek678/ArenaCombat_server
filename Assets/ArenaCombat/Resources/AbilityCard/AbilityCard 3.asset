@@ -16,4 +16,4 @@ MonoBehaviour:
   cardIcon: {fileID: -294562004, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: SurvivalPulse
   skillDefinition: {fileID: 11400000, guid: 218197d632b27c545ae7bb205ec4bcaf, type: 2}
-  skillObjectName:
+  skillObjectName: 4

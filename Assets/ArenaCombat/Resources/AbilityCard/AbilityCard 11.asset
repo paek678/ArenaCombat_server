@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0606cc0234635b741b1ff737732ccb7c, type: 3}
   m_Name: AbilityCard 11
   m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.Card.AbilityCard
-  cardName: "파열 탄창"
+  cardName: "\uD30C\uC5F4 \uD0C4\uCC3D"
   cardIcon: {fileID: -2039608761, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: RuptureMagazine
   skillDefinition: {fileID: 11400000, guid: 6d5f92d18b575ab4aafa0d44e60e1f8f, type: 2}
-  skillObjectName:
+  skillObjectName: 12

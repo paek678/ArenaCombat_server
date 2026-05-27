@@ -16,4 +16,4 @@ MonoBehaviour:
   cardIcon: {fileID: 1664222392, guid: af40bb445b3267940b9818a64c4a4d04, type: 3}
   description: ErosionField
   skillDefinition: {fileID: 11400000, guid: 2d6e5cbbbec36f845bfb66cccb8bebb8, type: 2}
-  skillObjectName:
+  skillObjectName: 3
