@@ -1791,23 +1791,7 @@ namespace ArenaCombat.Core.Network
         {
             float dt = Time.fixedDeltaTime;
 
-            if (!networkIsAlive.Value && respawnTimer > 0f)
-            {
-                GameStateManager gsm = GameStateManager.Instance;
-                bool matchEnded = gsm != null && gsm.CurrentMatchState == MatchState.MatchEnd;
-                if (!matchEnded)
-                {
-                    respawnTimer -= dt;
-                    if (respawnTimer <= 0f)
-                    {
-                        Vector3 spawnPos = MapBounds3D.Instance != null
-                            ? MapBounds3D.Instance.GetRespawnPointNear(lastValidatedServerPosition)
-                            : transform.position;
-                        Respawn(spawnPos);
-                        authoritativePos = transform.position;
-                    }
-                }
-            }
+            // No auto-respawn: dead players stay dead until match restart.
 
             if (invulnerabilityTimer > 0f)
             {
@@ -1991,13 +1975,6 @@ namespace ArenaCombat.Core.Network
             }
 
             follow.SetTarget(transform);
-
-            // Keep imported camera script aligned when present.
-            PlayerCamera playerCamera = cam.GetComponent<PlayerCamera>();
-            if (playerCamera != null)
-            {
-                playerCamera.SetTarget(transform);
-            }
         }
 
         private bool TryResolveOwnerCamera(out Camera camera)
@@ -2159,7 +2136,29 @@ namespace ArenaCombat.Core.Network
         [Rpc(SendTo.ClientsAndHost)]
         private void DeathEventRpc(ulong killerId)
         {
-            // Client-side effects/UI hook point.
+            if (!IsOwner || _isBTControlled) return;
+            SwitchCameraToAllyOrBoss();
+        }
+
+        private void SwitchCameraToAllyOrBoss()
+        {
+            if (ownerCamera == null) return;
+            var follow = ownerCamera.GetComponent<TopDownCameraFollow3D>();
+            if (follow == null) return;
+
+            var players = FindObjectsByType<PlayerNetworkController3D>(FindObjectsSortMode.None);
+            foreach (var p in players)
+            {
+                if (p == this || p == null) continue;
+                if (p.IsAlive)
+                {
+                    follow.SetSpectateTarget(p.transform);
+                    return;
+                }
+            }
+
+            if (BossManager.Instance != null && BossManager.Instance.CurrentBoss != null)
+                follow.SetSpectateTarget(BossManager.Instance.CurrentBoss.transform);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
@@ -2170,6 +2169,9 @@ namespace ArenaCombat.Core.Network
             {
                 suppressInterpolationUntil = Time.time + Mathf.Max(0f, respawnInterpolationSuppressDuration);
             }
+
+            if (IsOwner && !_isBTControlled)
+                SetupTopDownCamera();
         }
 
         [Rpc(SendTo.ClientsAndHost)]

@@ -557,6 +557,13 @@ namespace ArenaCombat.Core.Network
             Debug.Log($"[BossAI] Variant slots re-applied after phase change: {label}", this);
         }
 
+        public bool SetBossSkillSlot(int slotIndex, SkillDefinition skill)
+        {
+            if (!IsServer || !IsSpawned || !networkIsAlive.Value || _skillMgr == null)
+                return false;
+            return _skillMgr.SetSlot(slotIndex, skill);
+        }
+
         // X4-8 ML Agent movement entry point. Server-only: MovePosition + NV mirror.
         public void ApplyMLPosition(Vector3 targetPos)
         {

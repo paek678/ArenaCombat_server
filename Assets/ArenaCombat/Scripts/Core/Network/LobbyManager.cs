@@ -43,7 +43,9 @@ namespace ArenaCombat.Core.Network
         public event Action OnLobbyLeft;
         public event Action<string> OnError;
 
-        // 
+        //
+        private void FireError(string error) => OnError?.Invoke(error);
+
         public Lobby CurrentLobby => currentLobby;
         public bool IsHost => isHost;
         public bool IsInLobby => currentLobby != null;
@@ -149,13 +151,10 @@ namespace ArenaCombat.Core.Network
         /// </summary>
         public async Task<Lobby> CreateLobbyAsync(string lobbyName, bool isPrivate = false)
         {
-            try
+            return await LobbyServiceHelper.ExecuteAsync(async () =>
             {
-                //    
                 if (currentLobby != null)
-                {
                     await LeaveLobbyAsync();
-                }
 
                 var options = new CreateLobbyOptions
                 {
@@ -178,13 +177,7 @@ namespace ArenaCombat.Core.Network
                 OnLobbyCreated?.Invoke(currentLobby);
 
                 return currentLobby;
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Create lobby failed: {e.Message}");
-                OnError?.Invoke($"Create lobby failed: {e.Message}");
-                return null;
-            }
+            }, "Create lobby", FireError);
         }
 
         #endregion
@@ -196,12 +189,10 @@ namespace ArenaCombat.Core.Network
         /// </summary>
         public async Task<Lobby> JoinLobbyByCodeAsync(string lobbyCode)
         {
-            try
+            return await LobbyServiceHelper.ExecuteAsync(async () =>
             {
                 if (currentLobby != null)
-                {
                     await LeaveLobbyAsync();
-                }
 
                 var options = new JoinLobbyByCodeOptions
                 {
@@ -216,13 +207,7 @@ namespace ArenaCombat.Core.Network
                 OnLobbyJoined?.Invoke(currentLobby);
 
                 return currentLobby;
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Join by code failed: {e.Message}");
-                OnError?.Invoke($"Join by code failed: {e.Message}");
-                return null;
-            }
+            }, "Join by code", FireError);
         }
 
         /// <summary>
@@ -230,12 +215,10 @@ namespace ArenaCombat.Core.Network
         /// </summary>
         public async Task<Lobby> JoinLobbyByIdAsync(string lobbyId)
         {
-            try
+            return await LobbyServiceHelper.ExecuteAsync(async () =>
             {
                 if (currentLobby != null)
-                {
                     await LeaveLobbyAsync();
-                }
 
                 var options = new JoinLobbyByIdOptions
                 {
@@ -250,13 +233,7 @@ namespace ArenaCombat.Core.Network
                 OnLobbyJoined?.Invoke(currentLobby);
 
                 return currentLobby;
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Join by ID failed: {e.Message}");
-                OnError?.Invoke($"Join by ID failed: {e.Message}");
-                return null;
-            }
+            }, "Join by ID", FireError);
         }
 
         /// <summary>
@@ -264,12 +241,10 @@ namespace ArenaCombat.Core.Network
         /// </summary>
         public async Task<Lobby> QuickJoinAsync()
         {
-            try
+            return await LobbyServiceHelper.ExecuteAsync(async () =>
             {
                 if (currentLobby != null)
-                {
                     await LeaveLobbyAsync();
-                }
 
                 var options = new QuickJoinLobbyOptions
                 {
@@ -284,13 +259,7 @@ namespace ArenaCombat.Core.Network
                 OnLobbyJoined?.Invoke(currentLobby);
 
                 return currentLobby;
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Quick join failed: {e.Message}");
-                OnError?.Invoke($"Quick join failed: {e.Message}");
-                return null;
-            }
+            }, "Quick join", FireError);
         }
 
         #endregion
@@ -302,7 +271,7 @@ namespace ArenaCombat.Core.Network
         /// </summary>
         public async Task<List<Lobby>> QueryLobbiesAsync()
         {
-            try
+            return await LobbyServiceHelper.ExecuteAsync(async () =>
             {
                 var options = new QueryLobbiesOptions
                 {
@@ -321,13 +290,7 @@ namespace ArenaCombat.Core.Network
                 Debug.Log($"[LobbyManager] Lobby query completed - Found: {response.Results.Count}");
 
                 return response.Results;
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Query lobbies failed: {e.Message}");
-                OnError?.Invoke($"Query lobbies failed: {e.Message}");
-                return new List<Lobby>();
-            }
+            }, "Query lobbies", FireError) ?? new List<Lobby>();
         }
 
         #endregion
@@ -396,9 +359,8 @@ namespace ArenaCombat.Core.Network
         {
             if (currentLobby == null) return;
 
-            try
+            await LobbyServiceHelper.ExecuteAsync(async () =>
             {
-                //    
                 string actionWithTime = $"{DateTime.Now.Ticks}|{actionMessage}";
 
                 var options = new UpdatePlayerOptions
@@ -411,12 +373,7 @@ namespace ArenaCombat.Core.Network
 
                 currentLobby = await LobbyService.Instance.UpdatePlayerAsync(currentLobby.Id, PlayerId, options);
                 Debug.Log($"[LobbyManager] Action sent: {actionMessage}");
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Send action failed: {e.Message}");
-                OnError?.Invoke($"Send action failed: {e.Message}");
-            }
+            }, "Send action", FireError);
         }
 
         /// <summary>
@@ -426,7 +383,7 @@ namespace ArenaCombat.Core.Network
         {
             if (currentLobby == null) return;
 
-            try
+            await LobbyServiceHelper.ExecuteAsync(async () =>
             {
                 var options = new UpdatePlayerOptions
                 {
@@ -438,12 +395,7 @@ namespace ArenaCombat.Core.Network
 
                 currentLobby = await LobbyService.Instance.UpdatePlayerAsync(currentLobby.Id, PlayerId, options);
                 Debug.Log($"[LobbyManager] Ready state updated: {isReady}");
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Ready update failed: {e.Message}");
-                OnError?.Invoke($"Ready update failed: {e.Message}");
-            }
+            }, "Ready update", FireError);
         }
 
         /// <summary>
@@ -453,7 +405,7 @@ namespace ArenaCombat.Core.Network
         {
             if (currentLobby == null) return;
 
-            try
+            await LobbyServiceHelper.ExecuteAsync(async () =>
             {
                 var options = new UpdatePlayerOptions
                 {
@@ -465,12 +417,7 @@ namespace ArenaCombat.Core.Network
 
                 currentLobby = await LobbyService.Instance.UpdatePlayerAsync(currentLobby.Id, PlayerId, options);
                 Debug.Log($"[LobbyManager] Player name updated: {playerName}");
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Set player name failed: {e.Message}");
-                OnError?.Invoke($"Set player name failed: {e.Message}");
-            }
+            }, "Set player name", FireError);
         }
 
         #endregion
@@ -484,7 +431,7 @@ namespace ArenaCombat.Core.Network
         {
             if (currentLobby == null || !isHost) return;
 
-            try
+            await LobbyServiceHelper.ExecuteAsync(async () =>
             {
                 var options = new UpdateLobbyOptions
                 {
@@ -495,13 +442,8 @@ namespace ArenaCombat.Core.Network
                 };
 
                 currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
-                Debug.Log($"[LobbyManager] Relay Join Code : {relayJoinCode}");
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Save Relay join code failed: {e.Message}");
-                OnError?.Invoke($"Save Relay join code failed: {e.Message}");
-            }
+                Debug.Log($"[LobbyManager] Relay Join Code set: {relayJoinCode}");
+            }, "Save Relay join code", FireError);
         }
 
         /// <summary>
@@ -525,7 +467,7 @@ namespace ArenaCombat.Core.Network
         {
             if (currentLobby == null || !isHost) return;
 
-            try
+            await LobbyServiceHelper.ExecuteAsync(async () =>
             {
                 var options = new UpdateLobbyOptions
                 {
@@ -538,12 +480,7 @@ namespace ArenaCombat.Core.Network
                 currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
                 SetGameSessionActive(started);
                 Debug.Log($"[LobbyManager] Game started flag updated: {started}");
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Set game started failed: {e.Message}");
-                OnError?.Invoke($"Set game started failed: {e.Message}");
-            }
+            }, "Set game started", FireError);
         }
 
         /// <summary>
@@ -558,6 +495,19 @@ namespace ArenaCombat.Core.Network
                 return data.Value == "true";
             }
             return false;
+        }
+
+        /// <summary>
+        /// Force-clears lobby state without calling the Lobby API.
+        /// Used when returning from a disconnected game session where the
+        /// lobby may already be gone.
+        /// </summary>
+        public void ForceCleanup()
+        {
+            currentLobby = null;
+            isHost = false;
+            isGameSessionActive = false;
+            OnLobbyLeft?.Invoke();
         }
 
         /// <summary>
@@ -593,15 +543,12 @@ namespace ArenaCombat.Core.Network
 
         private async void SendHeartbeatAsync()
         {
-            try
+            string lobbyId = currentLobby.Id;
+            await LobbyServiceHelper.ExecuteAsync(async () =>
             {
-                await LobbyService.Instance.SendHeartbeatPingAsync(currentLobby.Id);
+                await LobbyService.Instance.SendHeartbeatPingAsync(lobbyId);
                 Debug.Log("[LobbyManager] Heartbeat sent");
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.LogError($"[LobbyManager] Heartbeat : {e.Message}");
-            }
+            }, "Heartbeat");
         }
 
         /// <summary>
@@ -630,18 +577,25 @@ namespace ArenaCombat.Core.Network
             }
             catch (LobbyServiceException e)
             {
-                //    
-                if (e.Reason == LobbyExceptionReason.LobbyNotFound)
+                if (e.Reason == LobbyExceptionReason.LobbyNotFound
+                    || e.Reason == LobbyExceptionReason.LobbyConflict)
                 {
-                    Debug.Log("[LobbyManager] Lobby no longer exists");
+                    Debug.Log($"[LobbyManager] Lobby gone ({e.Reason}). Returning to main.");
                     currentLobby = null;
                     isHost = false;
                     OnLobbyLeft?.Invoke();
                 }
                 else
                 {
-                    Debug.LogError($"[LobbyManager] Lobby polling failed: {e.Message}");
+                    Debug.LogWarning($"[LobbyManager] Lobby polling failed: {e.Message}");
                 }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[LobbyManager] Unexpected poll error: {e.Message}");
+                currentLobby = null;
+                isHost = false;
+                OnLobbyLeft?.Invoke();
             }
         }
 

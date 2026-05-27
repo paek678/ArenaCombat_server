@@ -53,6 +53,25 @@ namespace ArenaCombat.Core.Skill
             return available.Take(count).ToList();
         }
 
+        public List<SkillDefinition> GetBossDraftCandidates(HashSet<string> ownedIds, int count = 3)
+        {
+            ownedIds ??= new HashSet<string>();
+            var available = _pool.Where(s =>
+                s != null &&
+                s.IsReady &&
+                s.RoleTags != null &&
+                System.Array.Exists(s.RoleTags, t => t == SkillRoleTag.Boss) &&
+                !ownedIds.Contains(s.SkillId)).ToList();
+
+            for (int i = available.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (available[i], available[j]) = (available[j], available[i]);
+            }
+
+            return available.Take(count).ToList();
+        }
+
         private int ScoreCounter(SkillDefinition skill, SkillRoleTag[] playerTags)
         {
             if (skill.CounterTags == null || playerTags == null) return 0;

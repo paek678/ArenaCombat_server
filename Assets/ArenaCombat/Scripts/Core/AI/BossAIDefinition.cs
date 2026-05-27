@@ -1,3 +1,4 @@
+using Unity.InferenceEngine;
 using UnityEngine;
 using ArenaCombat.Core.Skill;
 
@@ -16,6 +17,9 @@ namespace ArenaCombat.Core.AI
             playerType1 <= playerType2 ? (playerType1, playerType2) : (playerType2, playerType1);
 
         public bool isDefault = false;
+
+        [Header("ML Model")]
+        public ModelAsset model;
 
         public SkillDefinition[] skillSlots = new SkillDefinition[SkillManager.SlotCount];
 

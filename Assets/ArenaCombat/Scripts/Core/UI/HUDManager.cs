@@ -20,14 +20,12 @@ namespace ArenaCombat.Core.UI
         [SerializeField] private Color _slotBorderColor = new Color(0.8f, 0.7f, 0.3f, 1f);
         [SerializeField] private Color _readyGlowColor = new Color(1f, 1f, 0.6f, 0.4f);
 
-        private Image _player1HPFill;
-        private Image _player2HPFill;
+        private Image _playerHPFill;
         private Image _bossHPFill;
         private Text _bossNameLabel;
         private RectTransform _skillSlotContainer;
 
         private PlayerNetworkController3D _localPlayer;
-        private PlayerNetworkController3D _remotePlayer;
         private BossNetworkController3D _boss;
         private SkillManager _localSkillMgr;
         private GameStateManager _gsm;
@@ -71,10 +69,9 @@ namespace ArenaCombat.Core.UI
             if (_uiResolved) return;
 
             var canvas = transform;
-            _player1HPFill = FindImageInChildren(canvas, "Player1_HPBg");
+            _playerHPFill = FindImageInChildren(canvas, "Player_HPBg");
             _bossHPFill = FindImageInChildren(canvas, "Boss_HPBg");
             _bossNameLabel = FindTextInChildren(canvas, "Boss_NameLabel");
-            _player2HPFill = FindImageInChildren(canvas, "Player2_HPBg");
 
             var slotContainerT = FindDeep(canvas, "SkillSlotContainer");
             if (slotContainerT != null)
@@ -147,7 +144,6 @@ namespace ArenaCombat.Core.UI
             _refreshTimer = 0f;
             _lastKnownSlotHash = 0;
             _localPlayer = null;
-            _remotePlayer = null;
             _boss = null;
             _localSkillMgr = null;
             RefreshReferences();
@@ -162,7 +158,7 @@ namespace ArenaCombat.Core.UI
 
         private void RefreshReferences()
         {
-            if (_localPlayer != null && _remotePlayer != null && _boss != null && _localSkillMgr != null) return;
+            if (_localPlayer != null && _boss != null && _localSkillMgr != null) return;
 
             var players = FindObjectsByType<PlayerNetworkController3D>(FindObjectsSortMode.None);
             foreach (var p in players)
@@ -176,10 +172,6 @@ namespace ArenaCombat.Core.UI
                 {
                     _localPlayer = p;
                     _localSkillMgr = p.GetComponent<SkillManager>();
-                }
-                else
-                {
-                    _remotePlayer = p;
                 }
             }
 
@@ -209,20 +201,12 @@ namespace ArenaCombat.Core.UI
 
         private void UpdatePlayerHP()
         {
-            if (_player1HPFill != null && _localPlayer != null)
+            if (_playerHPFill != null && _localPlayer != null)
             {
                 float ratio = _localPlayer.MaxHP > 0f
                     ? Mathf.Clamp01(_localPlayer.CurrentHP / _localPlayer.MaxHP)
                     : 0f;
-                _player1HPFill.fillAmount = ratio;
-            }
-
-            if (_player2HPFill != null && _remotePlayer != null)
-            {
-                float ratio = _remotePlayer.MaxHP > 0f
-                    ? Mathf.Clamp01(_remotePlayer.CurrentHP / _remotePlayer.MaxHP)
-                    : 0f;
-                _player2HPFill.fillAmount = ratio;
+                _playerHPFill.fillAmount = ratio;
             }
         }
 
@@ -453,7 +437,6 @@ namespace ArenaCombat.Core.UI
         public void ForceRefresh()
         {
             _localPlayer = null;
-            _remotePlayer = null;
             _boss = null;
             _localSkillMgr = null;
             _uiResolved = false;

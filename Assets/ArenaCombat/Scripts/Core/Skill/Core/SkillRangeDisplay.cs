@@ -78,8 +78,9 @@ namespace ArenaCombat.Core.Skill
             Debug.Log($"[SkillRangeDisplay] Init complete (pool size {_poolSize}, procedural mesh)");
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            base.OnDestroy();
             foreach (var entry in _allEntries)
             {
                 if (entry.Mesh != null) Destroy(entry.Mesh);

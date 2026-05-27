@@ -17,26 +17,26 @@ namespace ArenaCombat.Core.AI
         public static PlayerArchetypeClassifier Instance { get; private set; }
 
         [Header("Distance Thresholds (meters)")]
-        [SerializeField] float _meleeDistance  = 5.0f;
-        [SerializeField] float _rangedDistance = 10.0f;
+        [SerializeField] float _meleeDistance  = 12.0f;
+        [SerializeField] float _rangedDistance = 20.0f;
 
         [Header("Eval Cycle")]
         [SerializeField] float _evalIntervalSec          = 180f;
         [SerializeField] float _passiveSampleIntervalSec = 0.5f;
-        [SerializeField, Range(0f, 1f)] float _weightDecayOnEval = 0.3f;
+        [SerializeField, Range(0f, 1f)] float _weightDecayOnEval = 0.5f;
 
         [Header("Classification Thresholds (%)")]
-        [SerializeField] float _dominantPercent       = 55f;
-        [SerializeField] float _semiDominantPercent   = 45f;
+        [SerializeField] float _dominantPercent       = 50f;
+        [SerializeField] float _semiDominantPercent   = 40f;
         [SerializeField] float _secondaryGuardPercent = 30f;
         [SerializeField] float _minTotalWeight        = 5.0f;
 
         [Header("Weight Values")]
         [SerializeField] float _meleeHitWeight        = 1.0f;
         [SerializeField] float _ccCastWeight          = 1.5f;
-        [SerializeField] float _parryWeight           = 2.0f;
+        [SerializeField] float _parryWeight           = 1.5f;
         [SerializeField] float _passiveDistanceWeight = 0.05f;
-        [SerializeField] float _slotCCBias            = 0.5f;
+        [SerializeField] float _slotCCBias            = 0.8f;
 
         class ArchetypeData
         {
@@ -86,7 +86,8 @@ namespace ArenaCombat.Core.AI
             if (!IsServer || float.IsNaN(distToBoss)) return;
             if (!_data.TryGetValue(clientId, out var d)) return;
             if (distToBoss < _meleeDistance) d.weights[0] += _meleeHitWeight;
-            else                              d.weights[1] += 0.5f;
+            else if (distToBoss < _rangedDistance) d.weights[0] += 0.3f;
+            else d.weights[1] += 0.5f;
         }
 
         public void RecordSkillCast(ulong clientId, SkillDefinition skill, float distToBoss)
@@ -96,13 +97,25 @@ namespace ArenaCombat.Core.AI
 
             bool isCC = skill.RoleTags != null && System.Array.Exists(skill.RoleTags,
                 t => t == SkillRoleTag.CC || t == SkillRoleTag.Silence);
-            bool isRanged = skill.Range > 8f || distToBoss > _rangedDistance;
-            bool isMelee = distToBoss < _meleeDistance;
+            bool isMeleeTagged = skill.RoleTags != null && System.Array.Exists(skill.RoleTags,
+                t => t == SkillRoleTag.Melee);
 
-            // Independent conditions — one cast may credit multiple buckets.
-            if (isCC)     d.weights[2] += _ccCastWeight;
-            if (isRanged) d.weights[1] += 1.0f;
-            if (isMelee)  d.weights[0] += 1.0f;
+            if (isCC)
+            {
+                d.weights[2] += _ccCastWeight;
+            }
+            else if (!isMeleeTagged)
+            {
+                if (skill.Range > 15f || distToBoss > _rangedDistance)
+                    d.weights[1] += 1.0f;
+                else if (skill.Range > 8f && distToBoss > _meleeDistance)
+                    d.weights[1] += 0.5f;
+            }
+
+            if (!isCC && distToBoss < _meleeDistance)
+                d.weights[0] += 1.0f;
+            else if (isMeleeTagged && distToBoss < _rangedDistance)
+                d.weights[0] += 0.5f;
         }
 
         public void RecordParrySuccess(ulong clientId)
@@ -178,16 +191,16 @@ namespace ArenaCombat.Core.AI
                 ulong clientId = kvp.Key;
                 var d = kvp.Value;
 
-                // Fresh slot CC bias from current loadout state (NOT stored — recomputed each eval).
-                float slotCCBonus = ComputeSlotCCBonus(nm, clientId);
+                // Fresh slot bias from current loadout (NOT stored — recomputed each eval).
+                ComputeSlotBonuses(nm, clientId, out float slotM, out float slotR, out float slotC);
 
-                float m = d.weights[0];
-                float r = d.weights[1];
-                float c = d.weights[2] + slotCCBonus;
+                float m = d.weights[0] + slotM;
+                float r = d.weights[1] + slotR;
+                float c = d.weights[2] + slotC;
                 var newType = Classify(m, r, c);
 
                 float total = m + r + c;
-                Debug.Log($"[Archetype] client={clientId} M={m:F1} R={r:F1} C={c:F1} (slotCC={slotCCBonus:F1}, total={total:F1}) → {newType}");
+                Debug.Log($"[Archetype] client={clientId} M={m:F1} R={r:F1} C={c:F1} (slotM={slotM:F1} slotR={slotR:F1} slotC={slotC:F1}, total={total:F1}) → {newType}");
 
                 if (newType != d.current)
                 {
@@ -210,20 +223,34 @@ namespace ArenaCombat.Core.AI
             _pendingChanges.Clear();
         }
 
-        float ComputeSlotCCBonus(NetworkManager nm, ulong clientId)
+        void ComputeSlotBonuses(NetworkManager nm, ulong clientId,
+            out float meleeBonus, out float rangedBonus, out float ccBonus)
         {
-            if (nm == null) return 0f;
-            if (!nm.ConnectedClients.TryGetValue(clientId, out var nc) || nc.PlayerObject == null) return 0f;
+            meleeBonus = rangedBonus = ccBonus = 0f;
+            if (nm == null) return;
+            if (!nm.ConnectedClients.TryGetValue(clientId, out var nc) || nc.PlayerObject == null) return;
             var skillMgr = nc.PlayerObject.GetComponentInChildren<SkillManager>();
-            if (skillMgr == null) return 0f;
-            float bonus = 0f;
+            if (skillMgr == null) return;
             foreach (var slot in skillMgr.Slots)
             {
                 if (slot == null || slot.RoleTags == null) continue;
-                if (System.Array.Exists(slot.RoleTags, t => t == SkillRoleTag.CC || t == SkillRoleTag.Silence))
-                    bonus += _slotCCBias;
+                bool hasCC = System.Array.Exists(slot.RoleTags,
+                    t => t == SkillRoleTag.CC || t == SkillRoleTag.Silence);
+                bool hasMelee = System.Array.Exists(slot.RoleTags,
+                    t => t == SkillRoleTag.Melee);
+                bool hasRanged = System.Array.Exists(slot.RoleTags,
+                    t => t == SkillRoleTag.Ranged);
+                bool hasSurvival = System.Array.Exists(slot.RoleTags,
+                    t => t == SkillRoleTag.Heal || t == SkillRoleTag.Shield
+                      || t == SkillRoleTag.Survival || t == SkillRoleTag.Regen);
+
+                if (hasCC)          ccBonus     += _slotCCBias;
+                else if (hasMelee)  meleeBonus  += _slotCCBias;
+                else if (hasRanged) rangedBonus += _slotCCBias;
+
+                if (hasSurvival && !hasCC && !hasMelee && !hasRanged)
+                    meleeBonus += _slotCCBias * 0.5f;
             }
-            return bonus;
         }
 
         PlayerArchetype Classify(float m, float r, float c)
@@ -246,8 +273,8 @@ namespace ArenaCombat.Core.AI
             if (cPct > topPct) { secondPct = topPct; topPct = cPct; topType = PlayerArchetype.CC; }
             else if (cPct > secondPct) secondPct = cPct;
 
-            if (topPct >= _dominantPercent) return topType;
-            if (topPct >= _semiDominantPercent && secondPct < _secondaryGuardPercent) return topType;
+            if (topPct >= _dominantPercent && topPct > secondPct) return topType;
+            if (topPct >= _semiDominantPercent && secondPct < _secondaryGuardPercent && topPct > secondPct) return topType;
             return PlayerArchetype.Hybrid;
         }
     }

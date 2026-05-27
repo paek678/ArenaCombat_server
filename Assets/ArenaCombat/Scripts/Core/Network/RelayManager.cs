@@ -1,5 +1,5 @@
 // ARCH TAG: SHARED
-// ARCH SCOPE: Relay/session and scene transition manager shared across gameplay modes.
+// ARCH SCOPE: Relay allocation and join only. Session lifecycle owned by SessionManager.
 // ARCH STATUS: TARGET_3D_ACTIVE
 
 using System;
@@ -10,29 +10,24 @@ using Unity.Networking.Transport.Relay;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace ArenaCombat.Core.Network
 {
     /// <summary>
     /// Relay session manager.
     /// Handles Relay allocation/join and NGO transport setup.
+    /// Scene transitions and disconnect are owned by SessionManager.
     /// </summary>
     public class RelayManager : MonoBehaviour
     {
         public static RelayManager Instance { get; private set; }
 
-        // Events
-        public event Action<string> OnRelayCreated;      // Join code broadcast
+        public event Action<string> OnRelayCreated;
         public event Action OnRelayJoined;
-        public event Action OnGameStarted;               // Fired on local scene load complete
         public event Action<string> OnError;
 
-        // State
         public bool IsRelayConnected { get; private set; }
         public string CurrentJoinCode { get; private set; }
-        private bool networkCallbacksRegistered;
-        private bool sceneLoadCallbackRegistered;
 
         private void Awake()
         {
@@ -45,102 +40,6 @@ namespace ArenaCombat.Core.Network
             {
                 Destroy(gameObject);
             }
-        }
-
-        private void OnEnable()
-        {
-            TryRegisterNetworkCallbacks();
-        }
-
-        private void Start()
-        {
-            TryRegisterNetworkCallbacks();
-        }
-
-        private void Update()
-        {
-            // Handle DDOL initialization order where NetworkManager may appear later.
-            if (!networkCallbacksRegistered)
-            {
-                TryRegisterNetworkCallbacks();
-            }
-        }
-
-        private void OnDisable()
-        {
-            UnregisterNetworkCallbacks();
-            UnregisterSceneLoadCallback();
-        }
-
-        private void OnDestroy()
-        {
-            UnregisterNetworkCallbacks();
-            UnregisterSceneLoadCallback();
-        }
-
-        private void TryRegisterNetworkCallbacks()
-        {
-            if (networkCallbacksRegistered)
-            {
-                return;
-            }
-
-            var networkManager = NetworkManager.Singleton;
-            if (networkManager == null)
-            {
-                return;
-            }
-
-            networkManager.OnClientConnectedCallback += OnClientConnected;
-            networkManager.OnClientDisconnectCallback += OnClientDisconnected;
-            networkCallbacksRegistered = true;
-        }
-
-        private void UnregisterNetworkCallbacks()
-        {
-            if (!networkCallbacksRegistered)
-            {
-                return;
-            }
-
-            var networkManager = NetworkManager.Singleton;
-            if (networkManager != null)
-            {
-                networkManager.OnClientConnectedCallback -= OnClientConnected;
-                networkManager.OnClientDisconnectCallback -= OnClientDisconnected;
-            }
-
-            networkCallbacksRegistered = false;
-        }
-
-        private void RegisterSceneLoadCallback()
-        {
-            var networkManager = NetworkManager.Singleton;
-            if (networkManager == null || networkManager.SceneManager == null)
-            {
-                return;
-            }
-
-            // Prevent duplicate registration when StartGame is called repeatedly.
-            networkManager.SceneManager.OnLoadComplete -= OnSceneLoadComplete;
-            networkManager.SceneManager.OnLoadComplete += OnSceneLoadComplete;
-            sceneLoadCallbackRegistered = true;
-        }
-
-        private void UnregisterSceneLoadCallback()
-        {
-            if (!sceneLoadCallbackRegistered)
-            {
-                return;
-            }
-
-            var networkManager = NetworkManager.Singleton;
-            if (networkManager != null && networkManager.SceneManager != null)
-            {
-                networkManager.SceneManager.OnLoadComplete -= OnSceneLoadComplete;
-            }
-
-            sceneLoadCallbackRegistered = false;
         }
 
         #region Host
@@ -258,98 +157,15 @@ namespace ArenaCombat.Core.Network
 
         #endregion
 
-        #region Game Start
-
-        [SerializeField] private string gameSceneName = "Chapter1";
+        #region State
 
         /// <summary>
-        /// Starts game scene transition. Host only.
+        /// Clears relay connection state. Called by SessionManager during disconnect.
         /// </summary>
-        public void StartGame()
+        public void ClearState()
         {
-            var networkManager = NetworkManager.Singleton;
-            if (networkManager == null)
-            {
-                Debug.LogError("[RelayManager] NetworkManager is missing. Cannot start game.");
-                OnError?.Invoke("NetworkManager is missing. Cannot start game.");
-                return;
-            }
-
-            if (!networkManager.IsHost)
-            {
-                Debug.LogWarning("[RelayManager] Only host can start the game.");
-                return;
-            }
-
-            if (networkManager.SceneManager == null)
-            {
-                Debug.LogError("[RelayManager] SceneManager is missing. Cannot load game scene.");
-                OnError?.Invoke("SceneManager is missing. Cannot load game scene.");
-                return;
-            }
-
-            Debug.Log("[RelayManager] Starting game scene transition");
-            LobbyManager.Instance?.SetGameSessionActive(true);
-
-            RegisterSceneLoadCallback();
-            networkManager.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
-        }
-
-        private void OnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
-        {
-            var networkManager = NetworkManager.Singleton;
-            if (networkManager == null)
-            {
-                return;
-            }
-
-            if (clientId == networkManager.LocalClientId)
-            {
-                Debug.Log($"[RelayManager] Local scene load complete - ClientId: {clientId}, Scene: {sceneName}");
-                OnGameStarted?.Invoke();
-                UnregisterSceneLoadCallback();
-            }
-        }
-
-        #endregion
-
-        #region Disconnect
-
-        [SerializeField] private string titleSceneName = "SampleScene";
-
-        /// <summary>
-        /// Disconnects relay/network session and returns to title scene.
-        /// </summary>
-        public void Disconnect()
-        {
-            UnregisterSceneLoadCallback();
-
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                NetworkManager.Singleton.Shutdown();
-                Debug.Log("[RelayManager] NetworkManager shutdown complete");
-            }
-
             IsRelayConnected = false;
             CurrentJoinCode = null;
-            LobbyManager.Instance?.SetGameSessionActive(false);
-
-            SceneManager.LoadScene(titleSceneName);
-            Debug.Log("[RelayManager] Returned to title scene");
-        }
-
-        #endregion
-
-        #region Callbacks
-
-        private void OnClientConnected(ulong clientId)
-        {
-            Debug.Log($"[RelayManager] Client connected - ClientId: {clientId}");
-        }
-
-        private void OnClientDisconnected(ulong clientId)
-        {
-            Debug.Log($"[RelayManager] Client disconnected - ClientId: {clientId}");
         }
 
         #endregion

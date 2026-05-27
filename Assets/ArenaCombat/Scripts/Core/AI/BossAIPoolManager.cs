@@ -28,6 +28,8 @@ namespace ArenaCombat.Core.AI
         private PlayerArchetypeClassifier _subscribedClassifier;
         private bool _needsEvaluate;
 
+        public event System.Action OnVariantSlotsApplied;
+
         public BossAIDefinition CurrentVariant => _currentDef;
         public BossAIDefinition PendingVariant => _pendingDef;
 
@@ -286,13 +288,22 @@ namespace ArenaCombat.Core.AI
         void ApplyVariant(BossNetworkController3D boss, BossAIDefinition def, (PlayerArchetype, PlayerArchetype) pairKey)
         {
             boss.ApplyAIVariant(def);
+
+            if (def.model != null)
+            {
+                var agent = boss.GetComponent<BossInferenceAgent>();
+                if (agent != null)
+                    agent.SetModel("BossInference", def.model);
+            }
+
             _currentDef = def;
             _pendingDef = null;
             _needsEvaluate = false;
             _debugCurrentVariant = def.name;
             _debugPairKey = $"{pairKey.Item1}+{pairKey.Item2}";
             _debugPending = "";
-            if (_verboseLog) Debug.Log($"[BossAI] swap applied: {def.name} (pair={pairKey.Item1}+{pairKey.Item2})", this);
+            if (_verboseLog) Debug.Log($"[BossAI] swap applied: {def.name} model={def.model?.name ?? "none"} (pair={pairKey.Item1}+{pairKey.Item2})", this);
+            OnVariantSlotsApplied?.Invoke();
         }
 
         void ApplyPending()
@@ -310,6 +321,7 @@ namespace ArenaCombat.Core.AI
         {
             if (!IsServer || _currentDef == null || _bossController == null) return;
             _bossController.ApplyAIVariantSlots(_currentDef);
+            OnVariantSlotsApplied?.Invoke();
         }
     }
 }

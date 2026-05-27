@@ -4249,8 +4249,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 766cc9f68e79fc24baf05e3ae04ea37a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: Chapter1
-  titleSceneName: SampleScene
 --- !u!1 &1397512006
 GameObject:
   m_ObjectHideFlags: 0
@@ -5183,6 +5181,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1521397652}
   m_CullTransparentMesh: 1
+--- !u!1 &1545274764
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1545274766}
+  - component: {fileID: 1545274765}
+  m_Layer: 0
+  m_Name: SessionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1545274765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1545274764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 295908e09b69f8445ba2ef8660d1e604, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.Network.SessionManager
+  gameSceneName: Chapter1
+  titleSceneName: SampleScene
+--- !u!4 &1545274766
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1545274764}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1625355128
 GameObject:
   m_ObjectHideFlags: 0
@@ -5537,6 +5581,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1786574549}
   - component: {fileID: 1786574550}
+  - component: {fileID: 1786574552}
+  - component: {fileID: 1786574551}
   m_Layer: 5
   m_Name: LobbyTestUI
   m_TagString: Untagged
@@ -5581,18 +5627,50 @@ MonoBehaviour:
   joinCodeInput: {fileID: 1484649907}
   lobbyPanel: {fileID: 1811895458}
   lobbyCodeText: {fileID: 1677876464}
-  playerSlotsContainer: {fileID: 2010379599}
-  debugLogText: {fileID: 633908692}
-  debugLogScrollRect: {fileID: 395672661}
+  playerSlotsUI: {fileID: 1786574552}
+  debugLog:
+    logText: {fileID: 633908692}
+    scrollRect: {fileID: 395672661}
+    maxLines: 50
+    timestampFormat: HH:mm:ss
   leaveLobbyButton: {fileID: 306539793}
   startGameButton: {fileID: 1625355130}
   gamePanel: {fileID: 389918851}
   gameStatusText: {fileID: 1992493217}
-  outgoingDataLogText: {fileID: 947422609}
-  outgoingDataScrollRect: {fileID: 473223255}
+  outgoingDataLog: {fileID: 1786574551}
   disconnectButton: {fileID: 2036884364}
   freezePlayerButton: {fileID: 1506968306}
   maxPlayers: 2
+--- !u!114 &1786574551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786574548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f31aacc0c7947bf42b2bbac5093bf215, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.UI.TestUI.OutgoingDataLog
+  logDisplay:
+    logText: {fileID: 947422609}
+    scrollRect: {fileID: 473223255}
+    maxLines: 50
+    timestampFormat: HH:mm:ss
+--- !u!114 &1786574552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786574548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa91e2c84aa8eab42a4a7ed3cad7a43f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.UI.TestUI.LobbyPlayerSlotsUI
+  playerSlotsContainer: {fileID: 2010379599}
   slotHeight: 60
   slotSpacing: 10
   emptySlotColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
@@ -6712,3 +6790,4 @@ SceneRoots:
   - {fileID: 457452125}
   - {fileID: 292502400}
   - {fileID: 373548725}
+  - {fileID: 1545274766}

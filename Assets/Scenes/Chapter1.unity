@@ -164,8 +164,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _evalInterval: 5
-  _rangedDistanceThreshold: 5
-  _teamCloseThreshold: 8
+  _rangedDistanceThreshold: 15
+  _teamCloseThreshold: 10
 --- !u!1 &38907801
 GameObject:
   m_ObjectHideFlags: 0
@@ -1098,7 +1098,7 @@ GameObject:
   - component: {fileID: 303875955}
   - component: {fileID: 303875954}
   m_Layer: 5
-  m_Name: Player2_HPBg
+  m_Name: Player_HPBg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3679,6 +3679,7 @@ GameObject:
   m_Component:
   - component: {fileID: 848940026}
   - component: {fileID: 848940025}
+  - component: {fileID: 848940027}
   m_Layer: 0
   m_Name: BossAIPoolManager
   m_TagString: Untagged
@@ -3729,6 +3730,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &848940027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848940024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f9a5b3c2d6e7f8a9b0c1d2e3f4a5b6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.AI.BossDraftManager
+  _weightTable: {fileID: 11400000, guid: 7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a, type: 2}
 --- !u!1 &848940100
 GameObject:
   m_ObjectHideFlags: 0
@@ -3758,20 +3772,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b544e40a767b00040b71e8726a994602, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArenaCombat.Core.AI.PlayerArchetypeClassifier
-  _meleeDistance: 5
-  _rangedDistance: 10
+  _meleeDistance: 12
+  _rangedDistance: 20
   _evalIntervalSec: 30
   _passiveSampleIntervalSec: 0.5
-  _weightDecayOnEval: 0.3
-  _dominantPercent: 55
-  _semiDominantPercent: 45
+  _weightDecayOnEval: 0.5
+  _dominantPercent: 50
+  _semiDominantPercent: 40
   _secondaryGuardPercent: 30
   _minTotalWeight: 1
   _meleeHitWeight: 1
   _ccCastWeight: 1.5
-  _parryWeight: 2
+  _parryWeight: 1.5
   _passiveDistanceWeight: 0.05
-  _slotCCBias: 0.5
+  _slotCCBias: 0.8
 --- !u!4 &848940102
 Transform:
   m_ObjectHideFlags: 0
@@ -5365,7 +5379,7 @@ GameObject:
   - component: {fileID: 1425855749}
   - component: {fileID: 1425855748}
   m_Layer: 5
-  m_Name: Player2_HPFrame
+  m_Name: Player_HPFrame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

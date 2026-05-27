@@ -12,8 +12,8 @@ namespace ArenaCombat.Core.AI
         public static PlayerBiasTracker Instance { get; private set; }
 
         [SerializeField] float _evalInterval = 5f;
-        [SerializeField] float _rangedDistanceThreshold = 5f;
-        [SerializeField, Min(0.01f)] float _teamCloseThreshold = 8f;
+        [SerializeField] float _rangedDistanceThreshold = 15f;
+        [SerializeField, Min(0.01f)] float _teamCloseThreshold = 10f;
 
         class PlayerBiasData
         {

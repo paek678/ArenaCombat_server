@@ -164,8 +164,8 @@ namespace ArenaCombat.Core.Network
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void ReportLoadedServerRpc(ServerRpcParams rpcParams = default)
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void ReportLoadedServerRpc(RpcParams rpcParams = default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
 

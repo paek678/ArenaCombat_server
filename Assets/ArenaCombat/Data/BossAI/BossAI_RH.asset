@@ -29,3 +29,4 @@ MonoBehaviour:
   - 1
   - 1
   cooldownScale: 1
+  model: {fileID: 5022602860645237092, guid: f6861fcd0e751464cb2a8fd5e1d9dff4, type: 3}
