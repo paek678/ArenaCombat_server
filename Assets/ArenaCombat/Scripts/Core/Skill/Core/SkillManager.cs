@@ -68,6 +68,9 @@ namespace ArenaCombat.Core.Skill
         private bool _useAdaptiveWeights;
         public bool UseAdaptiveWeights { get => _useAdaptiveWeights; set => _useAdaptiveWeights = value; }
 
+        private bool _aimAtTarget;
+        public bool AimAtTarget { get => _aimAtTarget; set => _aimAtTarget = value; }
+
         [Header("References")]
         [SerializeField] private StatManager _statManager;
         [SerializeField] private StateManager _stateManager;
@@ -430,7 +433,9 @@ namespace ArenaCombat.Core.Skill
                 Caster         = _owner,
                 PrimaryTarget  = target,
                 CastPosition   = transform.position,
-                CastDirection  = transform.forward,
+                CastDirection  = (_aimAtTarget && target?.Transform != null)
+                    ? AimDirection(target.Transform.position)
+                    : transform.forward,
                 ParryInputTime = (_statManager != null && _statManager.IsParrying) ? Time.time : 0f,
                 DamageScale    = _statManager != null
                     ? _statManager.GetPhaseDamageScale() * _statManager.GetDamageUpMultiplier()
@@ -438,6 +443,13 @@ namespace ArenaCombat.Core.Skill
             };
             ctx.RefreshSnapshot();
             return ctx;
+        }
+
+        Vector3 AimDirection(Vector3 targetPos)
+        {
+            Vector3 dir = targetPos - transform.position;
+            dir.y = 0f;
+            return dir.sqrMagnitude > 0.001f ? dir.normalized : transform.forward;
         }
 
         // ══════════════════════════════════════════════════════════

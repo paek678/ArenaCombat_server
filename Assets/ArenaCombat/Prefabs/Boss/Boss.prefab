@@ -132,6 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   _bossStatsSO: {fileID: 11400000, guid: d4dd746456a03144a8eff350dc2b343c, type: 2}
+  _visualRoot: {fileID: 3793979365519409563}
 --- !u!114 &1000007
 MonoBehaviour:
   m_ObjectHideFlags: 0

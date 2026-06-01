@@ -49,10 +49,12 @@ namespace ArenaCombat.Core.Network
         // Designer-assigned BossStatsSO. Required for InitializeStatManager to
         // produce a live boss; if null the boss stays inert (Codex X4-3 C-1).
         [SerializeField] private BossStatsSO _bossStatsSO;
+        [SerializeField] private Transform _visualRoot;
 
         private StatManager _statMgr;
         private SkillManager _skillMgr;
         private SkillExecutor _skillExec;
+        private BossVisualFollower _visualFollower;
         private BossTelegraphDisplay _telegraphDisplay;
         private Rigidbody _rb;
 
@@ -227,6 +229,26 @@ namespace ArenaCombat.Core.Network
 
             if (IsClient)
                 networkCurrentPhase.OnValueChanged += HandlePhaseChangedClient;
+
+            if (_skillMgr != null)
+                _skillMgr.AimAtTarget = true;
+
+            SetupVisualFollower();
+        }
+
+        void SetupVisualFollower()
+        {
+            if (_visualRoot == null)
+            {
+                var renderer = GetComponentInChildren<Renderer>();
+                if (renderer != null)
+                    _visualRoot = renderer.transform.root == transform
+                        ? renderer.transform : renderer.transform;
+            }
+            if (_visualRoot == null || _visualRoot == transform) return;
+
+            _visualFollower = _visualRoot.gameObject.AddComponent<BossVisualFollower>();
+            _visualFollower.Initialize(transform);
         }
 
         public override void OnNetworkDespawn()
@@ -253,6 +275,9 @@ namespace ArenaCombat.Core.Network
 
             if (IsClient)
                 networkCurrentPhase.OnValueChanged -= HandlePhaseChangedClient;
+
+            if (_visualFollower != null)
+                Destroy(_visualFollower.gameObject);
 
             // C3a-D: defensive cleanup for pooled boss objects.
             _wasBusy = false;
