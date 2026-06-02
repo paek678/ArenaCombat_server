@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "Boss Barrier Breaker"
   Description: "Piercing projectile. Deals shield-break damage + defense down + direct damage."
   Icon: {fileID: 0}
-  Cooldown: 14
+  Cooldown: 7
   TelegraphDuration: 1.4
   Range: 48
   TargetType: 3

@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "분쇄 연타"
   Description: "4단 연속 타격. 적중 시 실드 파괴 추가타, 빗나가면 광역 재시도."
   Icon: {fileID: 0}
-  Cooldown: 6
+  Cooldown: 3
   Range: 24
   TargetType: 3
   RoleTags:

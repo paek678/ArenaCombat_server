@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "Boss Seal Chain"
   Description: "4-direction ranged pattern. Damage + HitStun + Silence. UNIMPLEMENTED: needs multi-direction projectile wrapper."
   Icon: {fileID: 0}
-  Cooldown: 10
+  Cooldown: 5
   TelegraphDuration: 0.8
   Range: 48
   TargetType: 3

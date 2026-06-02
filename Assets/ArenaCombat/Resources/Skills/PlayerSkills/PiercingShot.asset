@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "관통 저격"
   Description: "직선 관통 투사체. 방어력 감소 + 고피해. 빗나가면 재발사."
   Icon: {fileID: 0}
-  Cooldown: 10
+  Cooldown: 5
   Range: 66
   TargetType: 3
   RoleTags:

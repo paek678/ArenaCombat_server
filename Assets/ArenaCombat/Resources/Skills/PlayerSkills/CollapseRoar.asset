@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "붕괴 포효"
   Description: "자기 중심 범위 공격. 좁은 범위 우선(피해+방어력감소), 빗나가면 광역."
   Icon: {fileID: 0}
-  Cooldown: 10
+  Cooldown: 5
   Range: 27
   TargetType: 1
   RoleTags:

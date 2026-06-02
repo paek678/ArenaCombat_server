@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "Boss Rupture Magazine"
   Description: "8-direction explosion pattern. Applies vulnerability + damage. UNIMPLEMENTED: needs multi-direction projectile wrapper."
   Icon: {fileID: 0}
-  Cooldown: 12
+  Cooldown: 6
   TelegraphDuration: 0.8
   Range: 48
   TargetType: 3

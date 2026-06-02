@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "Boss Crushing Barrage"
   Description: "4-hit combo. On hit, adds shield-break damage. On miss, retries with wider cone then multi-hit."
   Icon: {fileID: 0}
-  Cooldown: 10
+  Cooldown: 5
   TelegraphDuration: 1.2
   Range: 19
   TargetType: 3

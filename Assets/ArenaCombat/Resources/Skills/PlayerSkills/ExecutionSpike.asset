@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "처형 송곳"
   Description: "좁은 범위 정확 타격. 적중 시 취약 + 처형 피해, 빗나가면 넓은 범위 재시도."
   Icon: {fileID: 0}
-  Cooldown: 8
+  Cooldown: 4
   Range: 24
   TargetType: 3
   RoleTags:

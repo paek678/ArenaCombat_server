@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "파열 탄창"
   Description: "폭발 투사체. 취약 부여 + 고피해. 빗나가면 재발사."
   Icon: {fileID: 0}
-  Cooldown: 9
+  Cooldown: 5
   Range: 66
   TargetType: 3
   RoleTags:

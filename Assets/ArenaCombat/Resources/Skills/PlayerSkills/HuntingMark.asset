@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "사냥 표식"
   Description: "유도 투사체. 명중 시 피해 + 표식 디버프."
   Icon: {fileID: 0}
-  Cooldown: 7
+  Cooldown: 4
   Range: 66
   TargetType: 0
   RoleTags:

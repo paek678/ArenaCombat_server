@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "Boss Execution Spike"
   Description: "Narrow directional strike. On hit, applies vulnerability + execute damage below 30% HP. On miss, retries with wider cone."
   Icon: {fileID: 0}
-  Cooldown: 10
+  Cooldown: 5
   TelegraphDuration: 1.35
   Range: 26
   TargetType: 3

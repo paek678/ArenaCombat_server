@@ -17,7 +17,7 @@ MonoBehaviour:
   Description: "유도 투사체. 실드 파괴 + 방어력
     감소 + 본 피해."
   Icon: {fileID: 0}
-  Cooldown: 8
+  Cooldown: 4
   Range: 66
   TargetType: 0
   RoleTags:

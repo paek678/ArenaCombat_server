@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "Boss Collapse Roar"
   Description: "Inner AoE deals damage + HitStun + defense down. On miss, retries with wider AoE."
   Icon: {fileID: 0}
-  Cooldown: 14
+  Cooldown: 7
   TelegraphDuration: 1.6
   Range: 24
   TargetType: 1

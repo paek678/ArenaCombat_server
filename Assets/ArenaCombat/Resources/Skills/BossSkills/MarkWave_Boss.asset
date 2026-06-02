@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: "Boss Mark Wave"
   Description: "Forward 80-degree cone AoE. Deals damage and applies Mark debuff to all targets in range."
   Icon: {fileID: 0}
-  Cooldown: 12
+  Cooldown: 6
   TelegraphDuration: 1.4
   Range: 27
   TargetType: 1
