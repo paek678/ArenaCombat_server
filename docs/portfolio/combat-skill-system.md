@@ -4,7 +4,7 @@
 
 The combat and skill system is designed to keep gameplay resolution on the authoritative runtime side.
 
-The portfolio value is not only the number of skills. The stronger point is that combat and skills are organized through reusable definitions, context, and execution flow.
+Combat and skills share reusable definitions, execution context, and a common execution flow.
 
 ## Key Ideas
 
@@ -15,20 +15,19 @@ The portfolio value is not only the number of skills. The stronger point is that
 
 ## Verified Project Evidence
 
-- `Assets/ArenaCombat/Scripts/Core/Combat/`
-- `Assets/ArenaCombat/Scripts/Core/Skill/`
-- `Assets/ArenaCombat/Docs/SKILL_SYSTEM_DESIGN.md`
+- [Combat code](../../Assets/ArenaCombat/Scripts/Core/Combat/)
+- [Skill code](../../Assets/ArenaCombat/Scripts/Core/Skill/)
+- [Skill system design](../../Assets/ArenaCombat/Docs/SKILL_SYSTEM_DESIGN.md)
 
-## Suggested README Wording
+## Execution Flow
 
-```text
-Skills are represented through shared definitions and executed through a common runtime context. This keeps skill behavior easier to extend while allowing the host-authoritative runtime to resolve gameplay effects consistently.
-```
+| Component | Responsibility |
+| --- | --- |
+| `SkillDefinition` | Skill identity, cooldown, range, targeting, and AI hints |
+| `SkillContext` | Caster, targets, cast position and direction, and per-cast results |
+| `SkillExecutor` | Execute the skill's runtime behavior |
+| `SkillManager` | Manage slots, cooldowns, targeting, and auto-cast decisions |
 
-## Interview Talking Points
+`SkillLibrary` builds runtime skill behavior and `SkillBinder` attaches it to definitions. These runtime delegates are not serialized, so they must be bound again after a domain reload or scene initialization.
 
-- Why separate skill definition from execution?
-- What must be resolved by the host/server?
-- Which parts can stay client-side?
-- How does auto-cast interact with cooldown, targeting, and combat state?
-
+Skill effects are resolved through the authoritative runtime. Client-side presentation remains separate from decisions that change gameplay state.

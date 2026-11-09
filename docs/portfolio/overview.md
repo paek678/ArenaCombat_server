@@ -1,42 +1,41 @@
-# Portfolio Overview
+# Project Overview
 
-ArenaCombat_server is the main portfolio repository for the ArenaCombat / BuildUp project pair.
+ArenaCombat_server is the multiplayer runtime for the Arena Combat / Tenebris project. Two players cooperate against a boss in a Unity 3D top-down action game.
 
-The best public framing is:
+## Project Roles
 
-```text
-ArenaCombat_server = multiplayer boss-fight runtime
-BuildUp = related ML-Agents boss movement training project
-```
+| Project | Responsibility |
+| --- | --- |
+| ArenaCombat_server | Multiplayer sessions, authoritative combat and skills, player state, and boss movement inference |
+| BuildUp | Player bots, PPO movement training, matchup analysis, and ONNX model outputs |
 
-## Project Positioning
+Clients send gameplay intent to the host. The host validates requests, resolves combat and skill effects, and synchronizes resulting state through Netcode for GameObjects.
 
-ArenaCombat_server demonstrates a Unity 2-player co-op boss fight runtime built around host-authoritative multiplayer, server-side combat/skill resolution, and a runtime integration path for ML-trained boss movement.
+Boss movement policies are trained in [BuildUp](https://github.com/paek678/BuildUp). The runtime provides observation collection and ONNX model assignment, while skill selection and damage resolution remain in the authoritative game systems.
 
-The project should not be described as a finished commercial game. It is better described as a systems-heavy portfolio project focused on multiplayer authority, gameplay systems, boss AI integration, and AI-assisted development workflow.
+## Core Systems
 
-## Public Pitch
+- [Multiplayer runtime](multiplayer-runtime.md): host authority, request validation, and state synchronization.
+- [Combat and skill system](combat-skill-system.md): shared skill definitions, execution context, and server-side effects.
+- [Boss AI integration](boss-ai-integration.md): movement inference, player classification, and model selection.
 
-```text
-I built a Unity 2-player co-op boss fight runtime where clients send gameplay intent and the host resolves combat, skill effects, and synchronized state.
+## Scene Entry Points
 
-For boss movement AI, I separated training into a related Unity ML-Agents project called BuildUp. BuildUp trains movement policies using 129-channel observations and 5 discrete movement actions, then exports ONNX models that can be placed into the ArenaCombat_server runtime.
-```
+The build settings enable `Assets/Scenes/SampleScene.unity` as the lobby entry scene and `Assets/Scenes/Chapter1.unity` as the gameplay scene. `SessionManager` uses the same scene names for match start and return to the lobby.
 
-## Main Strengths
+## Implementation References
 
-- clear host-authoritative boundary
-- server-side combat and skill resolution
-- data-driven auto-cast skill system
-- ONNX-based boss movement integration path
-- traceable AI-assisted development harness
+- [Build scene settings](../../ProjectSettings/EditorBuildSettings.asset)
+- [Session manager](../../Assets/ArenaCombat/Scripts/Core/Network/SessionManager.cs)
+- [Skill system design](../../Assets/ArenaCombat/Docs/SKILL_SYSTEM_DESIGN.md)
+- [Network architecture notes](../../Assets/ArenaCombat/Docs/NETWORK_ARCHITECTURE.md)
+- [Historical BuildUp integration plan](../../Assets/ArenaCombat/Docs/BUILDUP_INTEGRATION_PLAN.md)
+- [ML training reference](../../Assets/ArenaCombat/Docs/ML_TRAINING_REFERENCE.md)
 
-## Evidence To Link
+Architecture and integration notes contain earlier implementation stages. Current code and build settings determine the active runtime paths.
 
-- `Assets/ArenaCombat/Docs/NETWORK_ARCHITECTURE.md`
-- `Assets/ArenaCombat/Docs/SKILL_SYSTEM_DESIGN.md`
-- `Assets/ArenaCombat/Docs/BUILDUP_INTEGRATION_PLAN.md`
-- `Assets/ArenaCombat/Docs/ML_TRAINING_REFERENCE.md`
-- `codex-review/CODEX_PROTOCOL.md`
-- `codex-review/history/`
+## Validation and Development Records
 
+The repository contains runtime code and ONNX assets. Final playable behavior, model selection, latency, synchronization under load, and balance require runtime validation.
+
+The implementation and review workflow is recorded separately in [AI development workflow](ai-development-harness.md), [review protocol](../../codex-review/CODEX_PROTOCOL.md), and [review history](../../codex-review/history/).

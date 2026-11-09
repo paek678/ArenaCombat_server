@@ -22,31 +22,19 @@ sequenceDiagram
     Runtime->>Client: Confirm resulting state
 ```
 
-## What This Shows
+## Authority and Synchronization
 
-- understanding of multiplayer authority boundaries
-- client intent vs. authoritative state separation
-- server-side validation mindset
-- state synchronization through NGO primitives
+One participant runs the host, combining server and client roles. Remote clients send gameplay intent; the host validates requests and determines the resulting gameplay state.
+
+Persistent state is synchronized through `NetworkVariable` values, while RPCs carry requests and gameplay events. Client presentation follows the authoritative results.
 
 ## Verified Project Evidence
 
 - Unity Netcode for GameObjects `2.11.2`
 - Unity Transport `2.7.2`
-- `Assets/ArenaCombat/Scripts/Core/Network/`
-- `Assets/ArenaCombat/Docs/NETWORK_ARCHITECTURE.md`
+- [Network runtime code](../../Assets/ArenaCombat/Scripts/Core/Network/)
+- [Network architecture notes](../../Assets/ArenaCombat/Docs/NETWORK_ARCHITECTURE.md)
 
-## Safe Portfolio Wording
+## Validation
 
-```text
-The runtime uses a host-authoritative model where gameplay intent is validated and resolved by the host before synchronized state is sent back to clients.
-```
-
-Avoid:
-
-```text
-dedicated server MMO
-complete anti-cheat
-commercial-grade netcode
-```
-
+Authority checks and synchronization paths are implemented in the runtime code. Latency, disconnect handling, and multiplayer stress behavior require playtesting; the architecture alone does not establish measured network performance or complete cheat prevention.

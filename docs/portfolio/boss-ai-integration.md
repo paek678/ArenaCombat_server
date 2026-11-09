@@ -2,9 +2,7 @@
 
 ## Goal
 
-Boss AI is presented as a hybrid runtime structure.
-
-The ML model should not be described as a full replacement for the boss AI. It is better described as a movement policy component that can be connected to the runtime through ONNX and matching observation/action specs.
+Boss AI combines an ONNX movement policy with server-side skill and combat systems. The movement policy uses 129 observation channels and one discrete branch with 5 actions: idle, forward, turn left, turn right, and backward.
 
 ## Relationship With BuildUp
 
@@ -23,23 +21,20 @@ ArenaCombat_server
 
 ## Verified Project Evidence
 
-- `Assets/ArenaCombat/Scripts/Core/AI/`
-- `Assets/ML-Agents/`
-- `Assets/onnx_9matchup/`
-- `Assets/ArenaCombat/Docs/BUILDUP_INTEGRATION_PLAN.md`
-- `Assets/ArenaCombat/Docs/ML_TRAINING_REFERENCE.md`
+- [AI runtime code](../../Assets/ArenaCombat/Scripts/Core/AI/)
+- [ML model assets](../../Assets/ML-Agents/)
+- [Matchup model assets](../../Assets/onnx_9matchup/)
+- [Historical BuildUp integration plan](../../Assets/ArenaCombat/Docs/BUILDUP_INTEGRATION_PLAN.md)
+- [ML training reference](../../Assets/ArenaCombat/Docs/ML_TRAINING_REFERENCE.md)
 
-## Safe Portfolio Wording
+## Runtime Flow
 
-```text
-The runtime contains an integration path for ONNX-based boss movement policies. Movement decisions can be supplied by ML models, while skill execution, damage resolution, and multiplayer authority remain in the game runtime.
-```
+`PlayerBiasTracker` records combat actions and team distance. `PlayerArchetypeClassifier` classifies players as Melee, Ranged, CC, or Hybrid. `BossAIPoolManager` uses the player pair to select a `BossAIDefinition` and assign its model through `Agent.SetModel`. Model changes are deferred while the boss is busy.
 
-Avoid:
+During a network session, `BossInferenceAgent.OnActionReceived` checks server authority before applying movement through `BossNetworkController3D`. Skill selection, auto-cast execution, and damage resolution remain in the server runtime. `BossDraftManager` handles response skill selection after card drafts.
 
-```text
-fully autonomous boss AI
-perfect ML boss
-all combat decisions controlled by ML
-```
+## Runtime Alignment and Validation
 
+The observation layout, normalization, action mapping, and movement behavior must match training. The current BuildUp agent scales backward movement to 70% of forward speed; the runtime agent uses its full configured movement speed for backward movement. This difference requires verification before declaring training and runtime behavior equivalent.
+
+ONNX assets and model-selection code are present. Final model assignments, behavior in a 2-player session, and combat balance require runtime validation. Older integration and handoff documents record historical specifications and should be checked against the current code.
