@@ -1,33 +1,33 @@
-# Combat & Skill System
+# 전투 및 스킬 시스템
 
-## Goal
+## 설계 목적
 
-The combat and skill system is designed to keep gameplay resolution on the authoritative runtime side.
+전투와 스킬의 게임 상태 판정은 호스트 권한을 가진 실행 환경에서 처리하도록 설계했습니다.
 
-Combat and skills share reusable definitions, execution context, and a common execution flow.
+전투와 스킬은 재사용 가능한 정의, 실행 문맥, 공통 실행 흐름을 공유합니다.
 
-## Key Ideas
+## 핵심 구성
 
-- skill data and execution logic are separated
-- combat effects are resolved by the authoritative runtime
-- client-side presentation remains separate from gameplay authority
-- auto-cast behavior can reuse a shared execution path
+- 스킬 데이터와 실행 로직 분리
+- 호스트 권한을 가진 실행 환경에서 전투 효과 판정
+- 클라이언트 연출과 게임 상태 판정 권한 분리
+- 자동 시전에서도 공통 실행 경로 사용
 
-## Verified Project Evidence
+## 관련 코드 및 문서
 
-- [Combat code](../../Assets/ArenaCombat/Scripts/Core/Combat/)
-- [Skill code](../../Assets/ArenaCombat/Scripts/Core/Skill/)
-- [Skill system design](../../Assets/ArenaCombat/Docs/SKILL_SYSTEM_DESIGN.md)
+- [전투 코드](../../Assets/ArenaCombat/Scripts/Core/Combat/)
+- [스킬 코드](../../Assets/ArenaCombat/Scripts/Core/Skill/)
+- [스킬 시스템 설계](../../Assets/ArenaCombat/Docs/SKILL_SYSTEM_DESIGN.md)
 
-## Execution Flow
+## 실행 흐름
 
-| Component | Responsibility |
+| 구성 요소 | 담당 역할 |
 | --- | --- |
-| `SkillDefinition` | Skill identity, cooldown, range, targeting, and AI hints |
-| `SkillContext` | Caster, targets, cast position and direction, and per-cast results |
-| `SkillExecutor` | Execute the skill's runtime behavior |
-| `SkillManager` | Manage slots, cooldowns, targeting, and auto-cast decisions |
+| `SkillDefinition` | 스킬 식별 정보, 쿨타임, 사거리, 대상 지정 방식, AI 참고 정보 |
+| `SkillContext` | 시전자, 대상, 시전 위치와 방향, 시전별 처리 결과 |
+| `SkillExecutor` | 스킬 실행 동작 처리 |
+| `SkillManager` | 슬롯, 쿨타임, 대상 지정, 자동 시전 판단 관리 |
 
-`SkillLibrary` builds runtime skill behavior and `SkillBinder` attaches it to definitions. These runtime delegates are not serialized, so they must be bound again after a domain reload or scene initialization.
+`SkillLibrary`가 실행 시 사용할 스킬 동작을 구성하고, `SkillBinder`가 해당 동작을 스킬 정의에 연결합니다. 실행 동작을 담은 델리게이트는 직렬화되지 않으므로 도메인 리로드나 씬 초기화 후 다시 연결해야 합니다.
 
-Skill effects are resolved through the authoritative runtime. Client-side presentation remains separate from decisions that change gameplay state.
+스킬 효과는 호스트 권한을 가진 실행 환경에서 판정합니다. 클라이언트 연출은 게임 상태를 변경하는 판단과 분리하여 처리합니다.

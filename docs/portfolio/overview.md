@@ -1,41 +1,41 @@
-# Project Overview
+# 프로젝트 개요
 
-ArenaCombat_server is the multiplayer runtime for the Arena Combat / Tenebris project. Two players cooperate against a boss in a Unity 3D top-down action game.
+ArenaCombat_server는 Arena Combat / Tenebris 프로젝트의 멀티플레이 실행 환경입니다. 두 명의 플레이어가 Unity 기반의 3D 탑다운 액션 게임에서 협력하여 보스를 상대합니다.
 
-## Project Roles
+## 프로젝트 역할
 
-| Project | Responsibility |
+| 프로젝트 | 담당 영역 |
 | --- | --- |
-| ArenaCombat_server | Multiplayer sessions, authoritative combat and skills, player state, and boss movement inference |
-| BuildUp | Player bots, PPO movement training, matchup analysis, and ONNX model outputs |
+| ArenaCombat_server | 멀티플레이 세션, 호스트 권한 기반 전투·스킬 판정, 플레이어 상태, 보스 이동 추론 |
+| BuildUp | 플레이어 봇, PPO 이동 정책 학습, 매치업별 분석, ONNX 모델 출력 |
 
-Clients send gameplay intent to the host. The host validates requests, resolves combat and skill effects, and synchronizes resulting state through Netcode for GameObjects.
+클라이언트는 입력 의도를 호스트에 전달합니다. 호스트는 요청을 검증하고 전투와 스킬 효과를 처리한 뒤, Netcode for GameObjects를 통해 결과 상태를 동기화합니다.
 
-Boss movement policies are trained in [BuildUp](https://github.com/paek678/BuildUp). The runtime provides observation collection and ONNX model assignment, while skill selection and damage resolution remain in the authoritative game systems.
+보스 이동 정책은 [BuildUp](https://github.com/paek678/BuildUp)에서 학습합니다. 실행 환경은 관측값 수집과 ONNX 모델 지정을 담당하고, 스킬 선택과 피해 판정은 호스트 권한을 가진 게임 시스템에서 처리합니다.
 
-## Core Systems
+## 핵심 시스템
 
-- [Multiplayer runtime](multiplayer-runtime.md): host authority, request validation, and state synchronization.
-- [Combat and skill system](combat-skill-system.md): shared skill definitions, execution context, and server-side effects.
-- [Boss AI integration](boss-ai-integration.md): movement inference, player classification, and model selection.
+- [멀티플레이 실행 구조](multiplayer-runtime.md): 호스트 권한, 요청 검증, 상태 동기화
+- [전투 및 스킬 시스템](combat-skill-system.md): 공통 스킬 정의, 실행 문맥, 서버 측 효과 처리
+- [보스 AI 연동](boss-ai-integration.md): 이동 추론, 플레이어 성향 분류, 모델 선택
 
-## Scene Entry Points
+## 시작 씬과 게임 씬
 
-The build settings enable `Assets/Scenes/SampleScene.unity` as the lobby entry scene and `Assets/Scenes/Chapter1.unity` as the gameplay scene. `SessionManager` uses the same scene names for match start and return to the lobby.
+빌드 설정에는 로비 진입 씬인 `Assets/Scenes/SampleScene.unity`와 게임플레이 씬인 `Assets/Scenes/Chapter1.unity`가 등록되어 있습니다. `SessionManager`도 같은 씬 이름을 사용하여 게임을 시작하거나 로비로 돌아갑니다.
 
-## Implementation References
+## 관련 코드 및 문서
 
-- [Build scene settings](../../ProjectSettings/EditorBuildSettings.asset)
-- [Session manager](../../Assets/ArenaCombat/Scripts/Core/Network/SessionManager.cs)
-- [Skill system design](../../Assets/ArenaCombat/Docs/SKILL_SYSTEM_DESIGN.md)
-- [Network architecture notes](../../Assets/ArenaCombat/Docs/NETWORK_ARCHITECTURE.md)
-- [Historical BuildUp integration plan](../../Assets/ArenaCombat/Docs/BUILDUP_INTEGRATION_PLAN.md)
-- [ML training reference](../../Assets/ArenaCombat/Docs/ML_TRAINING_REFERENCE.md)
+- [빌드 씬 설정](../../ProjectSettings/EditorBuildSettings.asset)
+- [세션 매니저](../../Assets/ArenaCombat/Scripts/Core/Network/SessionManager.cs)
+- [스킬 시스템 설계](../../Assets/ArenaCombat/Docs/SKILL_SYSTEM_DESIGN.md)
+- [네트워크 구조 기록](../../Assets/ArenaCombat/Docs/NETWORK_ARCHITECTURE.md)
+- [과거 BuildUp 통합 계획](../../Assets/ArenaCombat/Docs/BUILDUP_INTEGRATION_PLAN.md)
+- [ML 학습 참고 자료](../../Assets/ArenaCombat/Docs/ML_TRAINING_REFERENCE.md)
 
-Architecture and integration notes contain earlier implementation stages. Current code and build settings determine the active runtime paths.
+구조 설계와 통합 계획 문서에는 이전 개발 단계의 내용도 포함되어 있습니다. 현재 사용하는 실행 경로는 코드와 빌드 설정을 기준으로 확인해야 합니다.
 
-## Validation and Development Records
+## 검증 범위와 개발 기록
 
-The repository contains runtime code and ONNX assets. Final playable behavior, model selection, latency, synchronization under load, and balance require runtime validation.
+저장소에는 게임 실행 코드와 ONNX 모델 자산이 포함되어 있습니다. 최종 플레이 동작, 모델 선정, 네트워크 지연, 부하 상황의 동기화, 전투 밸런스는 실행 환경에서 검증해야 합니다.
 
-The implementation and review workflow is recorded separately in [AI development workflow](ai-development-harness.md), [review protocol](../../codex-review/CODEX_PROTOCOL.md), and [review history](../../codex-review/history/).
+구현과 검토 절차는 [AI 도구를 활용한 개발 및 검토 기록](ai-development-harness.md), [검토 절차](../../codex-review/CODEX_PROTOCOL.md), [검토 이력](../../codex-review/history/)에 별도로 정리되어 있습니다.
