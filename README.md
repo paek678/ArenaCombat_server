@@ -17,42 +17,17 @@
 
 카드 선택 사진은 로컬 호스트 1인 테스트에서 해당 단계를 디버그 호출해 촬영했습니다.
 
-## 방 참가에서 전투까지
+## 아키텍처
 
-로비에서는 함께 플레이할 사람을 모으고, 게임을 시작할 때 Relay를 통해 호스트와 참가자의 통신 경로를 연결합니다.
+![Unity Gaming Services의 인증·로비·Relay, 플레이어 호스트의 전투 판정과 보스 AI, 참가자의 입력·상태 수신을 보여주는 아키텍처](docs/figures/game-architecture.png)
 
-```mermaid
-flowchart TD
-    Auth["Unity Services 초기화<br/>각 플레이어 익명 인증"] --> HostLobby["호스트가 Lobby 생성"]
-    Auth --> GuestLobby["참가자가 방 코드로 Lobby 참가"]
-    HostLobby --> Start["호스트가 게임 시작"]
-    Start --> Relay["Relay 연결 생성<br/>NGO 호스트 시작"]
-    Relay --> Publish["로비에 Relay 코드와 시작 상태 공유"]
-    GuestLobby --> Read["참가자가 로비의 시작 상태 확인"]
-    Publish --> Read
-    Read --> Join["Relay 코드로 접속<br/>NGO 클라이언트 시작"]
-    Relay --> Scene["전투 씬 Chapter1 전환·동기화"]
-    Join --> Scene
-```
+1. **Authentication** — 호스트와 참가자는 Unity Services에서 익명으로 인증합니다.
+2. **Lobby** — 호스트가 방을 만들고 참가자는 방 코드로 들어옵니다. 호스트가 게임을 시작하면 Relay 접속 코드와 시작 상태가 로비를 통해 전달됩니다.
+3. **Relay · Unity Transport** — 호스트와 참가자 간의 게임 통신을 연결합니다. Netcode for GameObjects는 전투 씬 전환과 네트워크 오브젝트의 상태를 동기화합니다.
+4. **호스트 전투 처리** — 호스트가 입력과 스킬 요청을 확인하고 명중·피해·상태 변화를 확정합니다. 참가자는 NetworkVariable과 RPC로 전달받은 결과를 화면에 표시합니다.
+5. **보스 AI** — 호스트가 두 플레이어의 성향 조합에 맞는 ONNX 모델을 선택해 이동을 결정하고, 카드 선택 이후에는 가중치 규칙으로 대응 스킬을 구성합니다.
 
-플레이어는 방 코드를 입력해 로비에 참가합니다. 게임 시작 시 필요한 Relay 접속 코드는 로비 데이터를 통해 전달합니다.
-
-## 전투 한 번의 처리 흐름
-
-두 플레이어의 공격과 스킬 효과는 호스트에서 확정합니다. 같은 호스트에서 보스의 이동 추론과 전투 로직도 실행합니다.
-
-```mermaid
-flowchart TD
-    Input["플레이어 이동·공격·스킬 입력"] --> Request["클라이언트가 입력·사용 요청 전달"]
-    Request --> Validate["호스트가 요청과 사용 조건 확인"]
-    AI["보스 ONNX 이동 추론<br/>규칙·가중치 기반 스킬 선택"] --> Execute["호스트가 이동·스킬 실행"]
-    Validate --> Execute
-    Execute --> Judge["명중·피해·상태 변화 판정"]
-    Judge --> Sync["NetworkVariable · RPC로 결과 동기화"]
-    Sync --> Display["각 플레이어 화면에 위치·체력·이펙트 표시"]
-```
-
-[멀티플레이 실행 구조](docs/portfolio/multiplayer-runtime.md) · [전투 및 스킬 시스템](docs/portfolio/combat-skill-system.md)
+[멀티플레이 실행 구조](docs/portfolio/multiplayer-runtime.md) · [전투 및 스킬 시스템](docs/portfolio/combat-skill-system.md) · [보스 AI 연동](docs/portfolio/boss-ai-integration.md)
 
 ## 보스는 어떻게 대응하나요?
 
