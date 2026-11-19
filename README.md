@@ -15,17 +15,13 @@
 | ![방 생성과 참가 코드 입력 메뉴](docs/screenshots/room-menu.png) | ![세 장의 카드 중 하나를 고르는 선택 화면](docs/screenshots/card-selection.png) |
 | 호스트가 방을 만들고 다른 플레이어가 참가 코드를 입력하는 메뉴입니다. | 플레이어가 다음 전투에 사용할 스킬을 구성하는 선택 단계입니다. |
 
-카드 선택 사진은 로컬 호스트 1인 테스트에서 해당 단계를 디버그 호출해 촬영했습니다.
-
 ## 아키텍처
 
 ![Unity Gaming Services의 인증·로비·Relay, 플레이어 호스트의 전투 판정과 보스 AI, 참가자의 입력·상태 수신을 보여주는 아키텍처](docs/figures/game-architecture.png)
 
-1. **Authentication** — 호스트와 참가자는 Unity Services에서 익명으로 인증합니다.
-2. **Lobby** — 호스트가 방을 만들고 참가자는 방 코드로 들어옵니다. 호스트가 게임을 시작하면 Relay 접속 코드와 시작 상태가 로비를 통해 전달됩니다.
-3. **Relay · Unity Transport** — 호스트와 참가자 간의 게임 통신을 연결합니다. Netcode for GameObjects는 전투 씬 전환과 네트워크 오브젝트의 상태를 동기화합니다.
-4. **호스트 전투 처리** — 호스트가 입력과 스킬 요청을 확인하고 명중·피해·상태 변화를 확정합니다. 참가자는 NetworkVariable과 RPC로 전달받은 결과를 화면에 표시합니다.
-5. **보스 AI** — 호스트가 두 플레이어의 성향 조합에 맞는 ONNX 모델을 선택해 이동을 결정하고, 카드 선택 이후에는 가중치 규칙으로 대응 스킬을 구성합니다.
+1. **Relay · Unity Transport** — 호스트와 참가자 간의 게임 통신을 연결합니다. Netcode for GameObjects는 전투 씬 전환과 네트워크 오브젝트의 상태를 동기화합니다.
+2. **호스트 전투 처리** — 호스트가 입력과 스킬 요청을 확인하고 명중·피해·상태 변화를 확정합니다. 참가자는 NetworkVariable과 RPC로 전달받은 결과를 화면에 표시합니다.
+3. **보스 AI** — 호스트가 두 플레이어의 성향 조합에 맞는 ONNX 모델을 선택해 이동을 결정하고, 카드 선택 이후에는 가중치 규칙으로 대응 스킬을 구성합니다.
 
 [멀티플레이 실행 구조](docs/portfolio/multiplayer-runtime.md) · [전투 및 스킬 시스템](docs/portfolio/combat-skill-system.md) · [보스 AI 연동](docs/portfolio/boss-ai-integration.md)
 
@@ -46,14 +42,6 @@ flowchart TD
 
 이동 모델은 [BuildUp](https://github.com/paek678/BuildUp)에서 미리 학습합니다. 게임에서는 성향 조합에 맞는 모델을 불러와 다음 이동을 결정하며, 보스가 행동 중이면 교체를 보류합니다. 스킬 선택은 가중치 규칙이, 피해 판정은 호스트의 전투 코드가 담당합니다.
 
-## 팀원 및 역할
-
-| 이름 | 구분 | 담당 역할 |
-| --- | --- | --- |
-| 백성열 | 팀장 | 게임 기획, 서버 구축, 몬스터 AI 구현 |
-| 홍채영 | 팀원 | 클라이언트 개발, 서버 연결, 셰이더 추가 |
-| 곽다영 | 팀원 | UI/UX |
-
 ## 개발 정보
 
 | 항목 | 내용 |
@@ -71,3 +59,32 @@ flowchart TD
 - [보스 AI 연동](docs/portfolio/boss-ai-integration.md) · [게임에 포함된 이동 모델](Assets/onnx_9matchup/) · [학습 프로젝트 BuildUp](https://github.com/paek678/BuildUp)
 - [멀티플레이 실행 구조](docs/portfolio/multiplayer-runtime.md) · [전투와 스킬 시스템](docs/portfolio/combat-skill-system.md)
 - [프로젝트 개요](docs/portfolio/overview.md) · [개발·검토 기록](docs/portfolio/ai-development-harness.md)
+
+## 팀원
+
+<div align="center">
+<table>
+  <thead>
+    <tr>
+      <th>백성열</th>
+      <th>홍채영</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/paek678"><img src="https://avatars.githubusercontent.com/paek678?size=150" width="150" height="150" alt="백성열 GitHub 프로필 사진"></a>
+        <br><a href="https://github.com/paek678">@paek678</a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/hongchaeyoung0918-code"><img src="https://avatars.githubusercontent.com/hongchaeyoung0918-code?size=150" width="150" height="150" alt="홍채영 GitHub 프로필 사진"></a>
+        <br><a href="https://github.com/hongchaeyoung0918-code">@hongchaeyoung0918-code</a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">기획 · 서버 구축 · 몬스터 AI 구현</td>
+      <td align="center">클라이언트 개발 · 서버 연결 · 셰이더 추가</td>
+    </tr>
+  </tbody>
+</table>
+</div>
